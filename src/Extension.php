@@ -18,20 +18,20 @@ use Pig\CodingAgent\Extensions\ExtensionApi;
  */
 final class Extension
 {
-    public static function register(ExtensionApi $pi): void
+    public static function register(ExtensionApi $pig): void
     {
         $desktop = new DesktopClient();
-        ScreenScaler::useDirectory($pi->artifactsDirectory(...));
+        ScreenScaler::useDirectory($pig->artifactsDirectory(...));
         /** @var array{float, float} Last observed pixel-to-point scaling ratio */
         $lastScale = [1.0, 1.0];
 
         // -------------------------------------------------------------------------
         // Helper: capture and process screen observation
         // -------------------------------------------------------------------------
-        $observeScreen = static function () use ($desktop, &$lastScale, $pi): array {
+        $observeScreen = static function () use ($desktop, &$lastScale, $pig): array {
             $screenSize = $desktop->screenSize();
 
-            $artifactsDir = $pi->artifactsDirectory();
+            $artifactsDir = $pig->artifactsDirectory();
             if (!is_dir($artifactsDir)) {
                 mkdir($artifactsDir, 0o700, true);
             }
@@ -66,7 +66,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Slash Command: /computer
         // -------------------------------------------------------------------------
-        $pi->registerCommand(
+        $pig->registerCommand(
             name: 'computer',
             description: 'Native Mac desktop controller: /computer status | screenshot | app <name>',
             handler: static function (string $args, $ctx) use ($desktop, $observeScreen): void {
@@ -122,7 +122,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 1: computer_doctor
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_doctor',
             label: 'Computer Doctor',
             description: 'Diagnose local desktop automation environment, screen resolution, Retina scale and frontmost application.',
@@ -148,7 +148,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 2: computer_ready
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_ready',
             label: 'Computer Ready Check',
             description: 'Verify desktop control channel, return logical screen dimensions, active frontmost app and initial screen capture.',
@@ -196,7 +196,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 3: computer_observe
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_observe',
             label: 'Computer Observe Screen',
             description: 'Capture the current desktop screenshot and frontmost application information.',
@@ -239,7 +239,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 4: computer_click
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_click',
             label: 'Computer Mouse Click',
             description: 'Click mouse at coordinates (x, y). Coordinates can match the scaled screenshot and automatically convert to Retina points.',
@@ -303,7 +303,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 5: computer_drag
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_drag',
             label: 'Computer Mouse Drag',
             description: 'Drag mouse from (from_x, from_y) to (to_x, to_y).',
@@ -357,7 +357,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 6: computer_scroll
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_scroll',
             label: 'Computer Mouse Scroll',
             description: 'Scroll mouse wheel vertically or horizontally.',
@@ -404,7 +404,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 7: computer_type_text
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_type_text',
             label: 'Computer Type Text',
             description: 'Input text into the focused field with native clipboard support for Chinese, multiline, and special symbols.',
@@ -429,7 +429,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 8: computer_press_key
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_press_key',
             label: 'Computer Press Key',
             description: 'Press a keyboard key or shortcut combination (e.g. "Enter", "Tab", "Escape", "Space", "cmd+c", "cmd+v", "cmd+space").',
@@ -454,7 +454,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 9: computer_launch_app
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_launch_app',
             label: 'Computer Launch App Or URL',
             description: 'Launch or focus a desktop application (e.g. "Google Chrome", "Slack", "Finder") or open a URL for the person to see. Not for downloading: fetch a URL with bash (curl) instead.',
@@ -480,7 +480,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Tool 10: computer_batch
         // -------------------------------------------------------------------------
-        $pi->registerTool(new CustomTool(
+        $pig->registerTool(new CustomTool(
             name: 'computer_batch',
             label: 'Computer Batch Steps',
             description: 'Execute up to 15 sequential desktop operations with anti-ban random coordinate jitter and humanized micro-delays (120-300ms).',
@@ -536,7 +536,7 @@ final class Extension
         // -------------------------------------------------------------------------
         // Web HTTP Route: /api/computer (Live Desktop Monitoring)
         // -------------------------------------------------------------------------
-        $pi->registerHttpRoute('/api/computer', static function (string $path, array $req) use ($observeScreen): ?array {
+        $pig->registerHttpRoute('/api/computer', static function (string $path, array $req) use ($observeScreen): ?array {
             if ($path === '/api/computer/screen.jpg' && $req['method'] === 'GET') {
                 try {
                     $obs = $observeScreen();
